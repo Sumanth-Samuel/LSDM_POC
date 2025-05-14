@@ -11,7 +11,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# === CONFIG ===
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
 SCHEMA_PATH = r"C:/Users/SumanthJSamuel/POC to Host/schema.sql"
 OUTPUT_DIR = r"C:/Users/SumanthJSamuel/POC to Host/index"
@@ -20,7 +20,6 @@ INDEX_FILE = os.path.join(OUTPUT_DIR, "schema_index.faiss")
 CHUNKS_FILE = os.path.join(OUTPUT_DIR, "schema_chunks.pkl")
 EMBEDDING_MODEL = "text-embedding-3-small"
 
-# === FUNCTIONS ===
 
 def extract_tables(schema: str):
     """Parse CREATE TABLE blocks into individual table chunks."""
@@ -44,9 +43,8 @@ def get_embedding(text: str, max_retries=3, base_wait=2) -> list:
             if attempt < max_retries - 1:
                 time.sleep(base_wait * (2 ** attempt))
             else:
-                raise RuntimeError(f"❌ Failed to embed after {max_retries} attempts.")
+                raise RuntimeError(f"Failed to embed after {max_retries} attempts.")
 
-# === MAIN WORKFLOW ===
 
 # Ensure output directory exists
 Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
@@ -56,7 +54,7 @@ with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
     schema_text = f.read()
 
 schema_chunks = extract_tables(schema_text)
-print(f"📦 Extracted {len(schema_chunks)} schema chunks.")
+print(f"Extracted {len(schema_chunks)} schema chunks.")
 
 # Load or init cache
 if os.path.exists(CACHE_FILE):
@@ -66,7 +64,7 @@ else:
     cache = {}
 
 # Embed and cache
-print("🔄 Generating embeddings with caching and retries...")
+print("Generating embeddings with caching and retries...")
 embeddings = []
 for chunk in tqdm(schema_chunks, desc="Embedding chunks"):
     if chunk in cache:
@@ -89,6 +87,6 @@ faiss.write_index(index, INDEX_FILE)
 with open(CHUNKS_FILE, "wb") as f:
     pickle.dump(schema_chunks, f)
 
-print(f"✅ FAISS index saved to: {INDEX_FILE}")
-print(f"✅ Schema chunks saved to: {CHUNKS_FILE}")
-print(f"✅ Embedding cache saved to: {CACHE_FILE}")
+print(f"FAISS index saved to: {INDEX_FILE}")
+print(f"Schema chunks saved to: {CHUNKS_FILE}")
+print(f"Embedding cache saved to: {CACHE_FILE}")

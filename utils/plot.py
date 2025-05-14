@@ -13,7 +13,6 @@ def smart_plot(df: pd.DataFrame):
 
     chart_options = ["Bar", "Pie", "Scatter", "Line", "Table"]
 
-    # === Smart Defaults ===
     default_chart = "Table"
     default_x = None
     default_y = None
@@ -27,7 +26,7 @@ def smart_plot(df: pd.DataFrame):
         default_x = cat_cols[0]
         default_y = numeric_cols[0]
 
-        # Pie if categories are few
+
         if df[default_x].nunique() <= 8:
             default_chart = "Pie"
     elif len(numeric_cols) >= 2:
@@ -35,7 +34,6 @@ def smart_plot(df: pd.DataFrame):
         default_x = numeric_cols[0]
         default_y = numeric_cols[1]
 
-    # === UI for Customizing Chart ===
     chart_col, x_col_sel, y_col_sel = st.columns([1, 2, 2])
 
     with chart_col:
@@ -53,7 +51,6 @@ def smart_plot(df: pd.DataFrame):
         y_default = default_y if default_y in numeric_cols else (numeric_cols[0] if numeric_cols else None)
         y_col = st.selectbox(" ", numeric_cols, index=numeric_cols.index(y_default) if y_default else 0, label_visibility="collapsed") if numeric_cols else None
 
-    # === Chart Rendering ===
     try:
         if chart_type == "Bar":
             fig = px.bar(df, x=x_col, y=y_col)

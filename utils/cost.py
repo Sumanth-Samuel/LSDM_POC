@@ -1,10 +1,9 @@
-# utils/cost.py
 import tiktoken
 from utils.llm import build_prompt
 
 PRICING = {
-    "text-embedding-3-small": {"input": 0.02},     # per 1M tokens
-    "gpt-4o": {"input": 2.5, "output": 10.0}        # per 1M tokens
+    "text-embedding-3-small": {"input": 0.02},    
+    "gpt-4o": {"input": 2.5, "output": 10.0}       
 }
 
 def count_tokens(text, model="gpt-4o"):
