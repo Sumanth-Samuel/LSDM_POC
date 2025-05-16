@@ -64,7 +64,7 @@ with left_col:
 
 with right_col:
     st.markdown(
-        f"#### 💸 Total Cost\n${st.session_state['total_cost']:.6f}",
+        f"#### Total Cost\n${st.session_state['total_cost']:.6f}",
         help="Estimated cumulative OpenAI API cost for this session"
     )
 
