@@ -117,10 +117,6 @@ CREATE TABLE BILL_SO_OLD (
   delete_date DATETIME -- Date value
 );
 
--- This table contains metadata about vendor bills (headers).
--- Each bill can contain multiple line items stored in BillLineItems.
--- Postage-related line items are marked with specific account_ids,
--- which are documented in ChartOfAccounts and used in BillLineItems.
 CREATE TABLE BillDetails (
   bill_pk INT,
   bill_id VARCHAR -- Unique identifier or primary key,
@@ -200,12 +196,6 @@ CREATE TABLE BillDetails (
   cf_due_amount_4 DECIMAL -- Monetary amount
 );
 
-
--- BillLineItems and Postage Allocation
--- This table contains the itemized charges for each bill.
--- Each line item includes an `account_id`, which maps to entries in ChartOfAccounts.
--- For postage-related expenses, specific account_ids are used, as listed in the ChartOfAccounts table comments.
--- These account_ids allow classifying and aggregating postage charges across vendors.
 CREATE TABLE BillLineItems (
   line_item_pk INT,
   bill_pk INT,
@@ -492,18 +482,6 @@ CREATE TABLE cfarview (
   outofscope DECIMAL
 );
 
-
--- Postage-Related Account Heads
--- This table holds the full Chart of Accounts used across billing, payments, and reporting.
--- The following accounts are used to tag postage-related line items in bills:
---   - '108943000000117061'
---   - '108943000022166889'
---       └─ '108943000022166895'
---       └─ '108943000022166901'
---   - '108943000021556003'
--- These account_ids are referenced in BillLineItems.account_id
--- and help categorize expenses related to postage in billing and accounting reports.
-
 CREATE TABLE ChartOfAccounts (
   account_id VARCHAR -- Unique identifier or primary key,
   account_name VARCHAR -- Name field,
@@ -617,10 +595,9 @@ CREATE TABLE customer (
 );
 
 CREATE TABLE CustomerPayments (
-  --this holds all payments from customer. it can be rtainer invoices or service invoices. retainer invocie id is the foreign key to retainer invocie table
   payment_id BIGINT -- Unique identifier or primary key,
   payment_number INT -- Payment-related field,
-  retainerinvoice_id VARCHAR --foreign key to retainer invoices,
+  retainerinvoice_id VARCHAR -- Unique identifier or primary key,
   invoice_numbers VARCHAR -- Invoice-related field,
   date DATE -- Date value,
   payment_mode VARCHAR -- Payment-related field,
@@ -629,19 +606,32 @@ CREATE TABLE CustomerPayments (
   bcy_amount DECIMAL -- Monetary amount,
   unused_amount DECIMAL -- Monetary amount,
   bcy_unused_amount DECIMAL -- Monetary amount,
-  account_id BIGINT -- foregn key to chart of accounts,
+  account_id BIGINT -- Unique identifier or primary key,
   account_name VARCHAR -- Name field,
   description TEXT -- Description or notes,
   reference_number VARCHAR -- Reference ID or external link,
-  customer_id BIGINT -- foreign key to customer table
+  customer_id BIGINT -- Unique identifier or primary key,
   customer_name VARCHAR -- Name field,
   created_time DATETIME -- Record creation time,
   last_modified_time DATETIME -- Last modification time,
+  last_four_digits VARCHAR,
+  gateway_transaction_id VARCHAR -- Unique identifier or primary key,
+  payment_gateway VARCHAR -- Payment-related field,
+  bcy_refunded_amount DECIMAL -- Monetary amount,
+  applied_invoices TEXT -- Invoice-related field,
+  has_attachment BIT,
+  documents TEXT,
+  custom_fields_list TEXT,
+  tax_account_id VARCHAR -- Unique identifier or primary key,
+  tax_account_name VARCHAR -- Name field,
+  tax_amount_withheld DECIMAL -- Monetary amount,
   payment_type VARCHAR -- Payment-related field,
   payment_status VARCHAR -- Payment-related field,
+  settlement_status VARCHAR,
   delete_ind BIT,
   data_collection_update_date DATETIME -- Date value,
- 
+  customer_advance_account_id VARCHAR -- Unique identifier or primary key,
+  customer_advance_account_name VARCHAR -- Name field
 );
 
 CREATE TABLE Employee (
@@ -884,18 +874,16 @@ CREATE TABLE invoicelineitems (
 );
 
 CREATE TABLE InvoicePayments (
-  --this table is supposed to hold all payments towrds an invoice by the customer. Payment id if foreign key to customer payments table
   InvoicePayment_pk INT -- Invoice-related field,
   invoice_payment_id VARCHAR -- Unique identifier or primary key,
   Invoice_id VARCHAR -- Unique identifier or primary key,
-  Payment_id VARCHAR -- foreign key to customer payments,
+  Payment_id VARCHAR -- Unique identifier or primary key,
   date DATE -- Date value,
   payment_mode VARCHAR -- Payment-related field,
   reference_number VARCHAR -- Reference ID or external link,
   description VARCHAR -- Description or notes,
   amount DECIMAL -- Monetary amount
 );
-
 
 CREATE TABLE Invoices (
   invoice_id VARCHAR -- Unique identifier or primary key,
@@ -1173,24 +1161,33 @@ CREATE TABLE RateNew2 (
 );
 
 CREATE TABLE retainerinvoices (
-  --this holds all the retainer invoices raised for all the long term customers
   retainerinvoice_id VARCHAR -- Unique identifier or primary key,
   customer_name VARCHAR -- Name field,
-  retainerinvoice_number VARCHAR -- This is retainer number,
+  retainerinvoice_number VARCHAR -- Invoice-related field,
   customer_id VARCHAR -- Unique identifier or primary key,
   status VARCHAR,
   reference_number VARCHAR -- Reference ID or external link,
   project_or_estimate_name VARCHAR -- Name field,
   date DATE -- Date value,
-  currency_id VARCHAR -- currency
+  currency_id VARCHAR -- Unique identifier or primary key,
   currency_code VARCHAR -- Currency information,
+  is_viewed_by_client BIT,
+  client_viewed_time DATETIME,
   total DECIMAL -- Total value,
   balance DECIMAL -- Remaining balance,
   created_time DATETIME -- Record creation time,
   last_modified_time DATETIME -- Last modification time,
+  is_emailed BIT -- Email address,
+  last_payment_date DATE -- Date value,
+  has_attachment BIT,
   data_collection_update_date DATETIME -- Date value,
-  cf_due_date DATE -- Due Date ,
-  cf_108943000002628019 VARCHAR,--this is SO number
+  color_code VARCHAR,
+  current_sub_status_id VARCHAR -- Unique identifier or primary key,
+  current_sub_status VARCHAR,
+  mail_first_viewed_time DATETIME,
+  mail_last_viewed_time DATETIME,
+  cf_due_date DATE -- Date value,
+  cf_108943000002628019 VARCHAR,
   delete_ind BIT,
   delete_date DATETIME -- Date value
 );
